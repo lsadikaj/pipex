@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+         #
+#    By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/11 11:14:05 by lsadikaj          #+#    #+#              #
-#    Updated: 2024/12/11 14:35:24 by lsadikaj         ###   ########.fr        #
+#    Updated: 2024/12/12 19:05:00 by lsadikaj         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,8 +16,9 @@ NAME_BONUS = pipex_bonus
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -I includes -I libft -I bonus
 
-SRC = src/main.c src/pipex.c
-SRC_BONUS = bonus/main_bonus.c bonus/pipex_bonus.c
+SRC = src/main.c src/pipex.c src/utils.c
+SRC_BONUS = bonus/main_bonus.c bonus/pipex_bonus.c bonus/utils_bonus.c src/utils.c \
+			bonus/here_doc_bonus.c bonus/pipeline_bonus.c
 
 OBJ = $(SRC:.c=.o)
 OBJ_BONUS = $(SRC_BONUS:.c=.o)
@@ -29,10 +30,11 @@ all: $(NAME)
 $(NAME): $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
 
-bonus: $(NAME_BONUS)
-
-$(NAME_BONUS): $(OBJ_BONUS) $(LIBFT)
+bonus: $(LIBFT) $(OBJ_BONUS)
+	@echo "Compiling bonus executable"
 	$(CC) $(CFLAGS) -o $(NAME_BONUS) $(OBJ_BONUS) $(LIBFT)
+
+$(OBJ_BONUS): $(SRC_BONUS)
 
 $(LIBFT):
 	make -C libft
@@ -46,3 +48,6 @@ fclean: clean
 	make -C libft fclean
 
 re: fclean all
+
+debug:
+	@echo "OBJ_BONUS: $(OBJ_BONUS)"

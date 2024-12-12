@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 11:31:17 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/11 12:06:23 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/12 19:02:20 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 #include <fcntl.h> //Pour open(), O_WRONLY, O_CREAT, etc.
 #include <unistd.h> //Pour close (), access(), STDOUT_FILENO, etc.
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv, char **envp) 
+{
     if (argc != 5) {
         fprintf(stderr, "Usage: ./pipex file1 cmd1 cmd2 file2\n");
         return (1);
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
     close(outfile);
 
     // Étape 2 : Appeler la fonction principale du projet (pipex)
-    pipex(argv[1], argv[2], argv[3], argv[4]);
+    pipex(argv[1], argv[2], argv[3], argv[4], envp);
 
     return (0);
 }

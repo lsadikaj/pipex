@@ -3,99 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/11 14:47:58 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/12 19:11:37 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/pipex_bonus.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/wait.h>
-#include "libft.h"
+#include "pipex_bonus.h"
 
-// Ouvrir un fichier avec gestion des erreurs
-static int open_file(char *file, int flags, int mode)
+void pipex_bonus(int argc, char **argv, char **envp) 
 {
-    int fd = open(file, flags, mode);
-    if (fd < 0)
+    int infile_pipe[2];
+    int outfile;
+    int i;
+
+    if (ft_strncmp(argv[1], "here_doc", 8) == 0) 
     {
-        perror(file);
+        if (argc < 5) 
+        {
+            ft_printf("Usage: ./pipex here_doc LIMITER cmd1 ... cmdn outfile\n");
+            exit(1);
+        }
+        if (pipe(infile_pipe) == -1) 
+        {
+            perror("Error creating pipe");
+            exit(1);
+        }
+        read_here_doc(argv[2], infile_pipe[1]);
+        close(infile_pipe[1]); // Assurez-vous de fermer le pipe d'écriture
+        i = 3;
+        outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+    } 
+    else 
+    {
+        if (argc < 5) 
+        {
+            ft_printf("Usage: ./pipex file1 cmd1 cmd2 ... cmdn file2\n");
+            exit(1);
+        }
+        infile_pipe[0] = open(argv[1], O_RDONLY); 
+        if (infile_pipe[0] < 0) 
+        {
+            perror(argv[1]);
+            exit(1);
+        }
+        i = 2;
+        outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    }
+
+    if (outfile < 0) 
+    {
+        perror(argv[argc - 1]);
         exit(1);
     }
-    return (fd);
-}
 
-// Exécuter une commande dans un processus enfant
-static void execute_command(int input, int output, char *cmd)
-{
-    char    **args = ft_split(cmd, ' ');
-
-    if (!command_path)
-    {
-        perror("Command not found");
-        exit(127);
-    }
-    dup2(input, STDIN_FILENO);
-    dup2(output, STDOUT_FILENO);
-    close(input);
-    close(output);
-    execve(args[0], args, NULL);
-    perror("Error executing command");
-    exit(127);
-}
-
-// Gérer un processus dans le pipeline
-static void handle_process(int input, int output, char *cmd)
-{
-    if (fork() == 0)
-    {
-        execute_command(input, output, cmd);
-    }
-}
-
-// Configurer et exécuter le pipeline
-static void execute_pipeline(int infile, int outfile, char **commands)
-{
-    int pipes[2];
-    int prev_fd = infile;
-    int i = 0;
-
-    while (commands[i])
-    {
-        if (commands[i + 1])
-        {
-            if (pipe(pipes) == -1)
-            {
-                perror("Pipe failed");
-                exit(1);
-            }
-            handle_process(prev_fd, pipes[1], commands[i]);
-            close(pipes[1]);
-            prev_fd = pipes[0];
-        }
-        else
-        {
-            handle_process(prev_fd, outfile, commands[i]);
-            close(prev_fd);
-        }
-        i++;
-    }
-}
-
-// Fonction principale orchestrant les pipes
-void pipex_bonus(char *file1, char **commands, char *file2)
-{
-    int infile = open_file(file1, O_RDONLY, 0);
-    int outfile = open_file(file2, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-    execute_pipeline(infile, outfile, commands);
-
-    close(outfile);
-    while (wait(NULL) > 0);
-    close(infile);
+    // Appeler execute_pipeline avec le bon infile
+    execute_pipeline(infile_pipe[0], outfile, &argv[i], envp);
 }
