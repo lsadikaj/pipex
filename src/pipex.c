@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:07:42 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/12 19:02:22 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/13 11:50:06 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int open_file(char *file, int flags, int mode)
     fd = open(file, flags, mode);
     if (fd < 0)
     {
-        perror(file);
+        perror("Opening file failed");
         exit(1);
     }
     return (fd);

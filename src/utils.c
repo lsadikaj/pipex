@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 12:01:03 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/12 19:02:25 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/13 23:55:21 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,22 @@ char	*build_command_path(char *cmd, char *directory)
 	return (NULL);
 }
 
+// Libérer un tablerau de chaînes
+void	free_array(char **array)
+{
+	int	i;
+
+	i = 0;
+	if (!array)
+		return ;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
+
 // Rechercher la commande dans PATH
 char	*find_command(char *cmd, char **envp)
 {
@@ -75,20 +91,4 @@ char	*find_command(char *cmd, char **envp)
 	}
 	free_array(directories);
 	return (NULL);
-}
-
-// Libérer un tablerau de chaînes
-void	free_array(char **array)
-{
-	int	i;
-
-	i = 0;
-	if (!array)
-		return ;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
 }
