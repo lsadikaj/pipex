@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+         #
+#    By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/11 11:14:05 by lsadikaj          #+#    #+#              #
-#    Updated: 2024/12/12 19:05:00 by lsadikaj         ###   ########.fr        #
+#    Updated: 2024/12/17 10:26:41 by lsadikaj         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,11 +28,11 @@ LIBFT = libft/libft.a
 all: $(NAME)
 
 $(NAME): $(OBJ) $(LIBFT)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -L libft -lft
 
 bonus: $(LIBFT) $(OBJ_BONUS)
 	@echo "Compiling bonus executable"
-	$(CC) $(CFLAGS) -o $(NAME_BONUS) $(OBJ_BONUS) $(LIBFT)
+	$(CC) $(CFLAGS) -o $(NAME_BONUS) $(OBJ_BONUS) -L libft -lft
 
 $(OBJ_BONUS): $(SRC_BONUS)
 

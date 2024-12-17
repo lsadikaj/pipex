@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipeline_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 14:46:57 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/12 19:15:13 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/17 10:55:20 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,11 @@ void	execute_pipeline(int infile, int outfile, char **commands, char **envp)
     i = 0;
     while (commands[i + 1]) // Toutes les commandes sauf la dernière
     {
-        pipes[0] = create_pipe(pipes);
+        create_pipe(pipes);
         fork_and_execute(prev_fd, pipes[1], commands[i], envp);
-        close_fd(prev_fd); // Ferme l'entrée précédente
-        prev_fd = pipes[0]; // Prépare le prochain fichier d'entrée
+        close_fd(pipes[1]); // Ferme la sortie du pipe dans le parent
+        close_fd(prev_fd); // Ferme l'entree precedente
+        prev_fd = pipes[0]; // Garde la nouvelle entree pour la prochaine commande
         i++;
     }
     // Dernière commande
