@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/17 11:08:32 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/17 15:14:29 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,10 @@ static int	open_outfile(char *filename, int append)
 		outfile = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (outfile < 0)
 	{
-		perror(filename);
+		perror("Error opening outfile");
 		exit(1);
 	}
+	printf("open_outfile: outfile fd = %d\n", outfile);
 	return (outfile);
 }
 
@@ -72,7 +73,12 @@ void	pipex_bonus(int argc, char **argv, char **envp)
 			ft_printf("Usage: ./pipex file1 cmd1 cmd2 ... cmdn file2\n");
 		infile_pipe[0] = setup_infile(argv[1]);
 		i = 2;
-		outfile = open_outfile(argv[argc - 1], 0);
+		outfile = open_outfile(argv[argc - 1], 1);
 	}
+	argv[argc - 1] = NULL;
+	printf("Commandes :\n");
+	for (int j = i; argv[j]; j++)
+    	printf("argv[%d] = %s\n", j, argv[j]);
+
 	execute_pipeline(infile_pipe[0], outfile, &argv[i], envp);
 }

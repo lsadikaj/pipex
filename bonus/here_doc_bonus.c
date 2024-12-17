@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 14:48:06 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/17 11:00:28 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/17 14:27:14 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,9 @@ void read_here_doc(const char *limiter, int pipe_fd)
     {
         write(STDOUT_FILENO, "> ", 2);
         line = read_line(STDIN_FILENO);
-        if (!line || (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
-            && line[ft_strlen(limiter)] == '\n'))
+        if (!line)
+            break ;
+        if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0)
         {
             free(line);
             break;
