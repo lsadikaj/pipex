@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:07:42 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/13 11:50:06 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/18 18:15:03 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,15 @@ static int open_file(char *file, int flags, int mode)
 {
     int fd;
 
+    // Si on utilise O_CREAT, garantir 0644 (permissions normales)
+    if (flags & O_CREAT)
+        mode = 0644;
+
+    // Ouvrir/créer le fichier avec les bons flags et permissions
     fd = open(file, flags, mode);
     if (fd < 0)
     {
-        perror("Opening file failed");
+        ft_printf("Error: %s: %s\n", file, strerror(errno));
         exit(1);
     }
     return (fd);
@@ -33,15 +38,15 @@ static void execute_command(int input, int output, char *cmd, char **envp)
     char *cmd_path;
 
     args = ft_split(cmd, ' ');
-    if (!args)
+    if (!args || !args[0])
     {
-        perror("Error splitting command");
-        exit(1);
+        ft_printf("Error: Invalid command '%s'\n", cmd);
+        exit(127);
     }
     cmd_path = find_command(args[0], envp);
     if (!cmd_path)
     {
-        perror("Command not found");
+        ft_printf("Error: Command not found: '%s'\n", args[0]);
         free_array(args);
         exit(127);
     }
@@ -49,11 +54,11 @@ static void execute_command(int input, int output, char *cmd, char **envp)
     dup2(output, STDOUT_FILENO);
     close(input);
     close(output);
-    execve(cmd_path, args, envp);
-    perror("Error executing command");
+    execve(cmd_path, args, envp); // Exécution de la commande
+    perror("execve");
     free(cmd_path);
     free_array(args);
-    exit(127);
+    exit(1);
 }
 
 // Gérer le premier processus

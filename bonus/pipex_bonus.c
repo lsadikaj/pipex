@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/17 15:14:29 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:10:23 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,21 +23,22 @@ static void	handle_here_doc(char **argv, int *infile_pipe)
 	close(infile_pipe[1]);
 }
 
-static int	open_outfile(char *filename, int append)
+static int open_outfile(char *filename, int append)
 {
-	int outfile;
+    int outfile;
 
-	if (append)
-		outfile = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	else
-		outfile = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (outfile < 0)
-	{
-		perror("Error opening outfile");
-		exit(1);
-	}
-	printf("open_outfile: outfile fd = %d\n", outfile);
-	return (outfile);
+    if (append)
+        outfile = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    else
+        outfile = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+    if (outfile < 0)
+    {
+        ft_printf("./pipex_bonus: %s: ", filename);
+        perror(NULL); // Affiche directement l'erreur système
+        exit(1);
+    }
+    return (outfile);
 }
 
 static int	setup_infile(char *filename)
@@ -47,7 +48,8 @@ static int	setup_infile(char *filename)
 	infile = open(filename, O_RDONLY);
 	if (infile < 0)
 	{
-		perror(filename);
+		ft_printf("Error: Cannot open input file '%s'\n", filename);
+		perror(NULL);
 		exit(1);
 	}
 	return (infile);
@@ -73,12 +75,8 @@ void	pipex_bonus(int argc, char **argv, char **envp)
 			ft_printf("Usage: ./pipex file1 cmd1 cmd2 ... cmdn file2\n");
 		infile_pipe[0] = setup_infile(argv[1]);
 		i = 2;
-		outfile = open_outfile(argv[argc - 1], 1);
+		outfile = open_outfile(argv[argc - 1], 0);
 	}
 	argv[argc - 1] = NULL;
-	printf("Commandes :\n");
-	for (int j = i; argv[j]; j++)
-    	printf("argv[%d] = %s\n", j, argv[j]);
-
 	execute_pipeline(infile_pipe[0], outfile, &argv[i], envp);
 }

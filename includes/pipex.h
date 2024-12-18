@@ -3,22 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:02:21 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/12 19:02:17 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:56:57 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include <unistd.h> //pour fork, execve, dup2, pipe, etc.
-# include <fcntl.h> //pour open, O_RDONLY, O_WRONLY, etc.
-# include <stdlib.h> //pour malloc, free, exit, etc.
-# include <stdio.h> //pour perror, printf
-# include <sys/wait.h> //pour wait, waitpid
+# include <unistd.h>//pour fork, execve, dup2, pipe, etc.
+# include <fcntl.h>//pour open, O_RDONLY, O_WRONLY, etc.
+# include <stdlib.h>//pour malloc, free, exit, etc.
+# include <stdio.h>//pour perror, printf
+# include <sys/wait.h>//pour wait, waitpid
 # include "libft.h"
+# include <string.h>// pour strerror(errno) 
+# include <errno.h>// pour errno
 
 void    pipex(char *file1, char *cmd1, char *cmd2, char *file2, char **envp);
 

@@ -6,7 +6,7 @@
 #    By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/11 11:14:05 by lsadikaj          #+#    #+#              #
-#    Updated: 2024/12/17 16:08:45 by lsadikaj         ###   ########.fr        #
+#    Updated: 2024/12/18 16:38:48 by lsadikaj         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,6 +48,3 @@ fclean: clean
 	make -C libft fclean
 
 re: fclean all
-
-debug:
-	@echo "OBJ_BONUS: $(OBJ_BONUS)"
