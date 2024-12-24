@@ -6,89 +6,104 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 12:01:03 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/13 23:55:21 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:15:48 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-// Trouver la variable PATH dans envp
-char	*get_path_from_envp(char **envp)
+void	handle_exit(int exit_nbr)
 {
-	int	i;
+	if (exit_nbr == 1)
+	{
+		ft_printf("Usage: ./pipex file1 cmd1 cmd2 file2\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+int	open_file(char *file, int mode)
+{
+	int	fd;
+
+	if (mode == 0)
+		fd = open(file, O_RDONLY);
+	else if (mode == 1)
+		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+	{
+		ft_printf("pipex: Invalid mode for file: %s\n", file);
+		exit(EXIT_FAILURE);
+	}
+	if (fd == -1)
+	{
+		ft_printf("pipex: Error opening file: %s\n", file);
+		exit(EXIT_FAILURE);
+	}
+	return (fd);
+}
+
+void	free_tab(char **tab)
+{
+	size_t	i;
 
 	i = 0;
-	while (envp[i])
+	while (tab[i])
 	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-			return (envp[i] + 5);
+		free(tab[i]);
 		i++;
 	}
-	return (NULL);
+	free(tab);
 }
 
-// Diviser PATH en répertoires
-char	**split_path_directories(char *path_var)
+char	*get_env_var(char *name, char **env)
 {
-	if (!path_var)
-		return (NULL);
-	return (ft_split(path_var, ':'));
-}
-
-// Construire le chemin complet et vérifier s'il est exécutable
-char	*build_command_path(char *cmd, char *directory)
-{
-	char	*temp_path;
-	char	*full_path;
-
-	temp_path = ft_strjoin(directory, "/");
-	full_path = ft_strjoin(temp_path, cmd);
-	free(temp_path);
-	if (access(full_path, X_OK) == 0)
-		return (full_path);
-	free(full_path);
-	return (NULL);
-}
-
-// Libérer un tablerau de chaînes
-void	free_array(char **array)
-{
-	int	i;
-
-	i = 0;
-	if (!array)
-		return ;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
-}
-
-// Rechercher la commande dans PATH
-char	*find_command(char *cmd, char **envp)
-{
-	char	*path_var;
-	char	**directories;
-	char	*command_path;
 	int		i;
+	int		j;
+	char	*sub;
 
-	path_var = get_path_from_envp(envp);
-	directories = split_path_directories(path_var);
-	if (!directories)
-		return (NULL);
 	i = 0;
-	while (directories[i])
+	while (env[i])
 	{
-		command_path = build_command_path(cmd, directories[i]);
-		if (command_path)
+		j = 0;
+		while (env[i][j] && env[i][j] != '=')
+			j++;
+		sub = ft_substr(env[i], 0, j);
+		if (ft_strncmp(sub, name, ft_strlen(name)) == 0)
 		{
-			free_array(directories);
-			return (command_path);
+			free(sub);
+			return (env[i] + j + 1);
 		}
+		free(sub);
 		i++;
 	}
-	free_array(directories);
+	return (NULL);
+}
+
+char	*get_path(char *cmd, char **env)
+{
+	int		i;
+	char	*exec;
+	char	*path_part;
+	char	**all_path;
+	char	**args;
+
+	all_path = ft_split(get_env_var("PATH", env), ':');
+	if (!all_path)
+		return (NULL);
+	args = ft_split(cmd, ' ');
+	if (!args)
+		return (free_tab(all_path), NULL);
+	i = -1;
+	while (all_path[++i])
+	{
+		path_part = ft_strjoin(all_path[i], "/");
+		exec = ft_strjoin(path_part, args[0]);
+		free(path_part);
+		if (access(exec, F_OK | X_OK) == 0)
+			return (free_tab(all_path), free_tab(args), exec);
+		free(exec);
+	}
+	free_tab(all_path);
+	free_tab(args);
 	return (NULL);
 }

@@ -3,80 +3,118 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/18 17:10:23 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:58:18 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-static void	handle_here_doc(char **argv, int *infile_pipe)
+void	exec(char *cmd, char **env)
 {
-	if (pipe(infile_pipe) == -1)
+	char	**args;
+	char	*path;
+
+	args = ft_split(cmd, ' ');
+	path = get_path(args[0], env);
+	if (execve(path, args, env) == -1)
 	{
-		perror("Error creating pipe");
-		exit(1);
+		write(2, "pipex: ", 7);
+		write(2, cmd, ft_strlen(cmd));
+		write(2, ": Command not found\n", 20);
+		free_tab(args);
+		exit(EXIT_FAILURE);
 	}
-	read_here_doc(argv[2], infile_pipe[1]);
-	close(infile_pipe[1]);
 }
 
-static int open_outfile(char *filename, int append)
+void	here_doc_put_in(char **av, int *p_fd)
 {
-    int outfile;
+	char	*ret;
 
-    if (append)
-        outfile = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-    else
-        outfile = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-    if (outfile < 0)
-    {
-        ft_printf("./pipex_bonus: %s: ", filename);
-        perror(NULL); // Affiche directement l'erreur système
-        exit(1);
-    }
-    return (outfile);
-}
-
-static int	setup_infile(char *filename)
-{
-	int infile;
-
-	infile = open(filename, O_RDONLY);
-	if (infile < 0)
+	close(p_fd[0]);
+	while (1)
 	{
-		ft_printf("Error: Cannot open input file '%s'\n", filename);
-		perror(NULL);
-		exit(1);
+		ret = get_next_line(0);
+		if (ft_strncmp(ret, av[2], ft_strlen(av[2])) == 0)
+		{
+			free(ret);
+			exit(0);
+		}
+		ft_putstr_fd(ret, p_fd[1]);
+		free(ret);
 	}
-	return (infile);
 }
 
-void	pipex_bonus(int argc, char **argv, char **envp)
+void	here_doc(char **av)
 {
-	int	infile_pipe[2];
-	int	outfile;
-	int	i;
+	int		p_fd[2];
+	pid_t	pid;
 
-	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+	if (pipe(p_fd) == -1)
+		exit(0);
+	pid = fork();
+	if (pid == -1)
+		exit(0);
+	if (!pid)
+		here_doc_put_in(av, p_fd);
+	else
 	{
-		if (argc < 5)
-			ft_printf("Usage: ./pipex here_doc LIMITER cmd1 ... cmdn outfile\n");
-		handle_here_doc(argv, infile_pipe);
-		i = 3;
-		outfile = open_outfile(argv[argc - 1], 1);
+		close(p_fd[1]);
+		dup2(p_fd[0], 0);
+		wait(NULL);
+	}
+}
+
+void	create_pipe(char *cmd, char **env)
+{
+	pid_t	pid;
+	int		p_fd[2];
+
+	if (pipe(p_fd) == -1)
+		exit(0);
+	pid = fork();
+	if (pid == -1)
+		exit(0);
+	if (!pid)
+	{
+		close(p_fd[0]);
+		dup2(p_fd[1], 1);
+		exec(cmd, env);
 	}
 	else
 	{
-		if (argc < 5)
-			ft_printf("Usage: ./pipex file1 cmd1 cmd2 ... cmdn file2\n");
-		infile_pipe[0] = setup_infile(argv[1]);
-		i = 2;
-		outfile = open_outfile(argv[argc - 1], 0);
+		close(p_fd[1]);
+		dup2(p_fd[0], 0);
 	}
-	argv[argc - 1] = NULL;
-	execute_pipeline(infile_pipe[0], outfile, &argv[i], envp);
+}
+
+int	main(int argc, char **argv, char **env)
+{
+	int		i;
+	int		fd_in;
+	int		fd_out;
+
+	if (argc < 5)
+		handle_exit(1);
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc") + 1) == 0)
+	{
+		if (argc < 6)
+			handle_exit(1);
+		i = 3;
+		fd_out = open_file(argv[argc - 1], 2);
+		here_doc(argv);
+	}
+	else
+	{
+		i = 2;
+		fd_in = open_file(argv[1], 0);
+		fd_out = open_file(argv[argc - 1], 1);
+		dup2(fd_in, 0);
+	}
+	while (i < argc - 2)
+		create_pipe(argv[i++], env);
+	dup2(fd_out, 1);
+	exec(argv[argc - 2], env);
 }
