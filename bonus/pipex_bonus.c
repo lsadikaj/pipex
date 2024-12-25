@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/24 13:58:18 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/25 23:55:26 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	here_doc_put_in(char **av, int *p_fd)
 	}
 }
 
-void	here_doc(char **av)
+void	here_doc(char **argv)
 {
 	int		p_fd[2];
 	pid_t	pid;
@@ -58,11 +58,11 @@ void	here_doc(char **av)
 	if (pid == -1)
 		exit(0);
 	if (!pid)
-		here_doc_put_in(av, p_fd);
+		here_doc_put_in(argv, p_fd);
 	else
 	{
 		close(p_fd[1]);
-		dup2(p_fd[0], 0);
+		dup2(p_fd[0], STDIN_FILENO);
 		wait(NULL);
 	}
 }
@@ -80,13 +80,13 @@ void	create_pipe(char *cmd, char **env)
 	if (!pid)
 	{
 		close(p_fd[0]);
-		dup2(p_fd[1], 1);
+		dup2(p_fd[1], STDOUT_FILENO);
 		exec(cmd, env);
 	}
 	else
 	{
 		close(p_fd[1]);
-		dup2(p_fd[0], 0);
+		dup2(p_fd[0], STDIN_FILENO);
 	}
 }
 
@@ -111,10 +111,10 @@ int	main(int argc, char **argv, char **env)
 		i = 2;
 		fd_in = open_file(argv[1], 0);
 		fd_out = open_file(argv[argc - 1], 1);
-		dup2(fd_in, 0);
+		dup2(fd_in, STDIN_FILENO);
 	}
 	while (i < argc - 2)
 		create_pipe(argv[i++], env);
-	dup2(fd_out, 1);
+	dup2(fd_out, STDOUT_FILENO);
 	exec(argv[argc - 2], env);
 }
