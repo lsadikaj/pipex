@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:07:42 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/24 14:03:06 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/25 16:02:59 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,10 @@ int	main(int argc, char **argv, char **env)
 	pid_t	pid;
 
 	if (argc != 5)
-		handle_exit(1);
+	{
+		ft_printf("Usage: ./pipex file1 cmd1 cmd2 file2\n");
+		exit(EXIT_FAILURE);
+	}
 	if (pipe(p_fd) == -1)
 	{
 		perror("pipe");

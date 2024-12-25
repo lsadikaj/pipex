@@ -6,20 +6,11 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 12:01:03 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/24 13:15:48 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/25 15:55:48 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void	handle_exit(int exit_nbr)
-{
-	if (exit_nbr == 1)
-	{
-		ft_printf("Usage: ./pipex file1 cmd1 cmd2 file2\n");
-		exit(EXIT_FAILURE);
-	}
-}
 
 int	open_file(char *file, int mode)
 {

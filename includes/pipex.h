@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:02:21 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/23 20:37:26 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/25 15:56:02 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,5 @@ char	*get_env_var(char *name, char **env);
 char	*get_path(char *cmd, char **env);
 void	exec(char *cmd, char **env);
 void	free_tab(char **tab);
-void	handle_exit(int exit_nbr);
 
 #endif
