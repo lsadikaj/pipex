@@ -6,7 +6,7 @@
 /*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:07:42 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/26 10:15:36 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/26 13:47:28 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,12 @@ void	child(char **argv, int *p_fd, char **env)
 	exec(argv[2], env);
 }
 
-void	parent(char **argv, int *p_fd, char **env, pid_t pid)
+void	parent(char **argv, int *p_fd, char **env)
 {
 	int	fd;
-	int	status;
 
 	close(p_fd[1]);
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-	{
-		close(p_fd[0]);
-		exit(WEXITSTATUS(status));
-	}
+	wait(NULL);
 	fd = open_file(argv[4], 1);
 	if (fd == -1)
 		exit(EXIT_FAILURE);
@@ -95,6 +89,6 @@ int	main(int argc, char **argv, char **env)
 	}
 	if (pid == 0)
 		child(argv, p_fd, env);
-	parent(argv, p_fd, env, pid);
+	parent(argv, p_fd, env);
 	return (0);
 }

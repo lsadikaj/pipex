@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:10:28 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/25 23:55:26 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/26 13:49:01 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	exec(char *cmd, char **env)
 	}
 }
 
-void	here_doc_put_in(char **av, int *p_fd)
+void	here_doc_put_in(char **argv, int *p_fd)
 {
 	char	*ret;
 
@@ -37,9 +37,10 @@ void	here_doc_put_in(char **av, int *p_fd)
 	while (1)
 	{
 		ret = get_next_line(0);
-		if (ft_strncmp(ret, av[2], ft_strlen(av[2])) == 0)
+		if (ft_strncmp(ret, argv[2], ft_strlen(argv[2])) == 0)
 		{
 			free(ret);
+			close(p_fd[1]);
 			exit(0);
 		}
 		ft_putstr_fd(ret, p_fd[1]);
@@ -57,7 +58,7 @@ void	here_doc(char **argv)
 	pid = fork();
 	if (pid == -1)
 		exit(0);
-	if (!pid)
+	if (pid == 0)
 		here_doc_put_in(argv, p_fd);
 	else
 	{
