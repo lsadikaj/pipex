@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lsadikaj <lsadikaj@student.42lausanne.ch > +#+  +:+       +#+        */
+/*   By: lsadikaj <lsadikaj@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 12:07:42 by lsadikaj          #+#    #+#             */
-/*   Updated: 2024/12/25 16:02:59 by lsadikaj         ###   ########.fr       */
+/*   Updated: 2024/12/26 10:15:36 by lsadikaj         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ void	child(char **argv, int *p_fd, char **env)
 {
 	int	fd;
 
+	close(p_fd[0]);
 	fd = open_file(argv[1], 0);
 	if (fd == -1)
 		exit(EXIT_FAILURE);
 	dup2(p_fd[1], STDOUT_FILENO);
 	dup2(fd, STDIN_FILENO);
-	close(p_fd[0]);
 	close(fd);
 	exec(argv[2], env);
 }
